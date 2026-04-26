@@ -1,6 +1,8 @@
 const http = require('http');
 const path = require('path');
 const fs = require('fs');
+const { Server } = require('socket.io');
+
 
 const pathToIndex = path.join(__dirname, 'static', 'index.html');
 const indexHtmlFile = fs.readFileSync(pathToIndex);
@@ -18,3 +20,11 @@ const server = http.createServer((req, res) => {
     return res.end('Error 404');
 });
 server.listen(3000);
+const io = new Server(server);
+
+ io.on('connection', (socket) => {
+        console.log('a user connected - ' + socket.id);
+        socket.on('new_message', (message) => {
+            io.emit('new_message', (message));
+        });
+    });
