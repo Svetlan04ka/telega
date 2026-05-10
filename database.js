@@ -24,7 +24,17 @@ dbWrapper
             password TEXT
           )
         `);
-
+        await db.run(`INSERT INTO user (login, password) VALUES
+           ('admin', 'admin'),
+           ('JavaScript', 'banana')
+           ('user1','password1' );`
+          );
+        await db.run(`CREATE TABLE message (
+          msg_id INTEGER PRIMARY KEY AUTOINCREMENT,
+          content TEXT,
+          author INTEGER,
+          FOREIGN KEY(author) REFERENCES user(user_id)
+        )`);  
       } else {
         console.log(await db.all('SELECT * FROM user'));
       }
@@ -32,11 +42,20 @@ dbWrapper
     } catch (dbError) {
       console.error(dbError);
     }
-    if(!exists) {
-        await db.run(`CREATE...`);
-        await db.run(`INSERT INTO...`);
-        await db.run(`CREATE...`);   
-    } else {
-        console.log(await db.all('SELECT * FROM user'));
-    }
   });
+module.exports = {
+  getMessages: async() => {
+    try{
+    return await db.all(
+      'SELECT msg_id, content, login, user_id from message JOIN user ON message.author = user.user_id'
+    );
+  } catch (dbError) {
+    console.error(dbError);
+  }
+},
+addMessage: async (content, author) => {
+  return await db.run('INSERT INTO message (content, author) VALUES (?, ?)',
+     [msg, userId]  
+  );
+}
+};
